@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heartverse 💖 Stories</title>
+<style>
+/* ---------- BASIC RESET ---------- */
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+body { background: #fff0f5; color:#333; }
+
+/* ---------- SPLASH SCREEN ---------- */
+#splash { position:fixed; top:0; left:0; width:100%; height:100%; background:#fff0f5; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000; }
+#splash img { width:120px; margin-bottom:20px; }
+#splash h1 { font-size:2em; color:#ff69b4; }
+
+/* ---------- NAV ---------- */
+nav { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#ffb6c1; }
+nav ul { display:flex; list-style:none; gap:15px; }
+nav a, nav button { text-decoration:none; color:#fff; font-weight:bold; background:none; border:none; cursor:pointer; font-size:1em; }
+
+/* ---------- CAROUSEL ---------- */
+.carousel { padding:20px; background:#ffe4e1; }
+.carousel h2 { text-align:center; margin-bottom:15px; color:#ff1493; }
+.carousel-container { display:flex; overflow-x:auto; scroll-behavior:smooth; gap:10px; padding-bottom:10px; }
+.carousel-item { min-width:150px; flex-shrink:0; text-align:center; background:#fff; border-radius:10px; padding:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); cursor:pointer; }
+.carousel-item img { width:100%; border-radius:10px; }
+
+/* ---------- SEARCH ---------- */
+#search { padding:20px; text-align:center; }
+#storySearch { width:80%; max-width:400px; padding:10px; border-radius:20px; border:1px solid #ff69b4; }
+#searchSuggestions { margin-top:10px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+#searchSuggestions span { background:#ff69b4; color:#fff; padding:5px 10px; border-radius:15px; font-size:0.9em; cursor:pointer; }
+
+/* ---------- STORY GRID ---------- */
+.story-grid { display:flex; flex-wrap:wrap; gap:15px; justify-content:center; padding:20px; }
+.story-grid a { display:block; width:150px; text-align:center; text-decoration:none; color:#333; }
+.story-grid a img { width:100%; border-radius:10px; }
+.story-grid a p { margin-top:5px; font-weight:bold; }
+
+/* ---------- STORY READER ---------- */
+#storyReader { display:none; padding:20px; max-width:800px; margin:0 auto; background:#fff0f5; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+#storyReader h1 { text-align:center; color:#ff1493; margin-bottom:10px; }
+#storyReader h3 { text-align:center; margin-bottom:20px; color:#ff69b4; }
+#storyContent { line-height:1.6; }
+
+/* ---------- FOOTER ---------- */
+footer { text-align:center; padding:20px; background:#ffb6c1; color:#fff; margin-top:20px; }
+
+/* ---------- BUTTONS ---------- */
+button { padding:5px 10px; border:none; border-radius:5px; background:#ff69b4; color:#fff; cursor:pointer; }
+button:hover { background:#ff1493; }
+
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <img src="https://i.ibb.co/Q6V5X2b/logo.png" alt="Heartverse Logo">
+  <h1>Welcome to Heartverse 💖</h1>
+</div>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="logo-nav"><strong>Heartverse 💖</strong></div>
+  <ul>
+    <li><button onclick="scrollToSection('carousel')">Home</button></li>
+    <li><button onclick="scrollToSection('library')">Stories</button></li>
+    <li><button onclick="scrollToSection('coming-soon')">Coming Soon</button></li>
+    <li><button id="musicToggle">🎵</button></li>
+  </ul>
+</nav>
+
+<!-- CAROUSEL -->
+<section id="carousel" class="carousel">
+  <h2>Top Stories 💖</h2>
+  <div class="carousel-container" id="carouselContainer"></div>
+</section>
+
+<!-- SEARCH -->
+<section id="search">
+  <input type="text" id="storySearch" placeholder="Search stories...">
+  <div id="searchSuggestions">
+    <span onclick="filterCategory('K-Drama')">K-Drama</span>
+    <span onclick="filterCategory('American')">American</span>
+    <span onclick="filterCategory('Romance')">Romance</span>
+    <span onclick="filterCategory('Drama')">Drama</span>
+    <span onclick="filterCategory('Fantasy')">Fantasy</span>
+  </div>
+</section>
+
+<!-- ALPHABETICAL STORY LIBRARY -->
+<section id="library">
+  <h2>All Stories 📚</h2>
+  <div class="story-grid" id="storyGrid"></div>
+</section>
+
+<!-- COMING SOON -->
+<section id="coming-soon">
+  <h2>Coming Soon 💌</h2>
+  <div class="story-grid" id="comingGrid"></div>
+</section>
+
+<!-- STORY READER -->
+<section id="storyReader">
+  <h1 id="readerTitle"></h1>
+  <h3 id="readerAuthor"></h3>
+  <div id="storyContent"></div>
+  <div style="text-align:center; margin-top:20px;">
+    <button onclick="closeStory()">Close</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Created by S.TECH 💖</p>
+</footer>
+
+<script>
+// ---------- SPLASH ----------
+window.addEventListener('load', () => {
+  setTimeout(() => { document.getElementById('splash').style.display='none'; }, 1500);
+});
+
+// ---------- MUSIC ----------
+let musicPlaying = false;
+const audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+audio.loop = true;
+document.getElementById("musicToggle").addEventListener("click", ()=>{
+  if(musicPlaying){ audio.pause(); musicPlaying=false; document.getElementById("musicToggle").textContent='🎵'; }
+  else{ audio.play(); musicPlaying=true; document.getElementById("musicToggle").textContent='🔇'; }
+});
+
+// ---------- STORIES DATA ----------
+const stories = [
+  {title:"The Billionaire’s Maid", author:"S.TECH", category:"Romance", cover:"https://i.ibb.co/6WPW3Z7/story1.jpg", content:"Chapter 1: She met the billionaire...\nChapter 2: Their worlds collided...\nChapter 3: Love and secrets..."},
+  {title:"Fated Hearts", author:"S.TECH", category:"Romance", cover:"https://i.ibb.co/8gTyz4t/story2.jpg", content:"Chapter 1: Destiny brought them together...\nChapter 2: Challenges...\nChapter 3: A promise..."},
+  {title:"Royal Flame", author:"S.TECH", category:"Drama", cover:"https://i.ibb.co/qC7s8fG/story3.jpg", content:"Chapter 1: Royal intrigues...\nChapter 2: Forbidden love...\nChapter 3: Choices..."},
+  {title:"My Best Friend’s Secret", author:"S.TECH", category:"Drama", cover:"https://i.ibb.co/2n6RwTG/story4.jpg", content:"Chapter 1: A secret revealed...\nChapter 2: Friendship tested...\nChapter 3: Confessions..."},
+  {title:"Whispers of Seoul", author:"S.TECH", category:"K-Drama", cover:"https://i.ibb.co/8N42pXd/story5.jpg", content:"Chapter 1: Arrival...\nChapter 2: First encounter...\nChapter 3: Hidden feelings...\nChapter 4: Confession...\nChapter 5: Challenges...\nChapter 6: Reunion...\nChapter 7: Whispers of Seoul..."}
+];
+
+const comingSoon = [
+  {title:"The Prince’s Lie", cover:"https://i.ibb.co/wCqp0fP/teaser1.jpg"},
+  {title:"Perfectly Wrong", cover:"https://i.ibb.co/1nfYVwD/teaser2.jpg"},
+  {title:"Her Last Goodbye", cover:"https://i.ibb.co/vm1v95V/teaser3.jpg"},
+  {title:"Fated Hearts: Season 2", cover:"https://i.ibb.co/ZJpPThG/teaser4.jpg"}
+];
+
+// ---------- RENDER CAROUSEL ----------
+const carouselContainer = document.getElementById('carouselContainer');
+stories.slice(0,3).forEach((s,i)=>{
+  const div=document.createElement('div'); div.className='carousel-item';
+  div.innerHTML=`<img src="${s.cover}" alt="${s.title}"><p>${s.title}</p>`;
+  div.onclick=()=>{openStory(i);}
+  carouselContainer.appendChild(div);
+});
+
+// ---------- RENDER LIBRARY ----------
+const storyGrid=document.getElementById('storyGrid');
+stories.sort((a,b)=>a.title.localeCompare(b.title)).forEach((s,i)=>{
+  const a=document.createElement('a'); a.href='#';
+  a.innerHTML=`<img src="${s.cover}"><p>${s.title}</p>`; 
+  a.onclick=(e)=>{e.preventDefault(); openStory(i);}
+  storyGrid.appendChild(a);
+});
+
+// ---------- RENDER COMING SOON ----------
+const comingGrid=document.getElementById('comingGrid');
+comingSoon.forEach((c)=>{
+  const a=document.createElement('a'); a.href='#';
+  a.innerHTML=`<img src="${c.cover}"><p>${c.title}</p>`; 
+  comingGrid.appendChild(a);
+});
+
+// ---------- STORY READER ----------
+const reader=document.getElementById('storyReader');
+const readerTitle=document.getElementById('readerTitle');
+const readerAuthor=document.getElementById('readerAuthor');
+const storyContent=document.getElementById('storyContent');
+
+function openStory(i){
+  const s=stories[i];
+  readerTitle.textContent=s.title;
+  readerAuthor.textContent=s.author;
+  storyContent.innerHTML=s.content.replace(/\n/g,'<br>');
+  reader.style.display='block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function closeStory(){ reader.style.display='none'; }
+
+// ---------- SEARCH ----------
+const searchInput=document.getElementById('storySearch');
+searchInput.addEventListener('input',()=>{
+  const val=searchInput.value.toLowerCase();
+  storyGrid.querySelectorAll('a').forEach(a=>{
+    const title=a.querySelector('p').textContent.toLowerCase();
+    a.style.display=title.includes(val)?'block':'none';
+  });
+});
+function filterCategory(cat){
+  storyGrid.querySelectorAll('a').forEach(a=>{
+    const title=a.querySelector('p').textContent;
+    const s=stories.find(x=>x.title===title);
+    a.style.display=(s.category===cat)?'block':'none';
+  });
+}
+
+// ---------- SCROLL TO SECTION ----------
+function scrollToSection(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+</script>
+
+</body>
+</html>
